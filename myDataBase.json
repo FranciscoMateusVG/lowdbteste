@@ -1,0 +1,5 @@
+{
+  "CHOC": { "template": "defaults", "restore": true, "modal": true },
+  "CHOCs": { "template": "default", "restore": true, "modal": false },
+  "CHOCssss": { "template": "default", "restore": true, "modal": true }
+}
