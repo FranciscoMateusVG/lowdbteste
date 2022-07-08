@@ -72,3 +72,19 @@ export const putPartner = async (ctx: KoaCTX) => {
     }
   }
 }
+
+export const deletePartner = async (ctx: KoaCTX) => {
+  try {
+    const { name } = ctx.params
+    const partnerExists = db.exists(`/${name}`)
+    if (!partnerExists) throw new Error('Partner does not exist')
+
+    db.delete(`/${name}`)
+    ctx.body = `${name} - Deleted`
+  } catch (error) {
+    if (error instanceof Error) {
+      ctx.status = 500
+      ctx.body = `Things exploded (${error.message})`
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import Router from 'koa-router'
 import Koa from 'koa'
 import {
+  deletePartner,
   getPartner,
   getPartners,
   postPartner,
@@ -32,3 +33,5 @@ router.get('/partner/:name', getPartner)
 router.post('/partner/:name', onlyAdmin, postPartner)
 
 router.put('/partner/:name', onlyAdmin, putPartner)
+
+router.delete('/partner/:name', onlyAdmin, deletePartner)
