@@ -1,30 +1,30 @@
 import { jsondb } from '../config/jsonDb'
 import { Partner } from './types'
 
-export const checkPartnerExists = (partner: string) => {
+export const checkPartnerExists = async (partner: string) => {
   const partnerExists = jsondb.exists(`/${partner}`)
 
   if (partnerExists) throw new Error('Partner already exists')
 }
 
-export const checkPartnerDoesntExists = (partner: string) => {
+export const checkPartnerDoesntExists = async (partner: string) => {
   const partnerExists = jsondb.exists(`/${partner}`)
   if (!partnerExists) throw new Error('Partner doesnt exist')
 }
 
-export const getPartnerDB = (partner?: string) =>
+export const getPartnerDB = async (partner?: string) =>
   jsondb.getObject<Partner>(`/${partner}`)
 
-export const postPartnerDB = (partner: string, body: Partner) => {
+export const postPartnerDB = async (partner: string, body: Partner) => {
   jsondb.push(`/${partner}`, body)
   return jsondb.getObject<Partner>(`/${partner}`)
 }
 
-export const putPartnerDB = (partner: string, body: Partner) => {
+export const putPartnerDB = async (partner: string, body: Partner) => {
   jsondb.push(`/${partner}`, body, false)
   return jsondb.getObject<Partner>(`/${partner}`)
 }
 
-export const deletePartnerDB = (partner: string) => {
+export const deletePartnerDB = async (partner: string) => {
   jsondb.delete(`/${partner}`)
 }

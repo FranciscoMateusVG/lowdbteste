@@ -1,3 +1,12 @@
+import { client } from '../config/mongoDB'
+// import {
+//   checkPartnerDoesntExists,
+//   checkPartnerExists,
+//   deletePartnerDB,
+//   getPartnerDB,
+//   postPartnerDB,
+//   putPartnerDB
+// } from '../utils/jsonDB'
 import {
   checkPartnerDoesntExists,
   checkPartnerExists,
@@ -5,14 +14,14 @@ import {
   getPartnerDB,
   postPartnerDB,
   putPartnerDB
-} from '../utils/jsonDB'
+} from '../utils/mongoDB'
 import { postPartnerSchema, putPartnerSchema } from '../utils/schemas'
 import { KoaCTX, Partner } from '../utils/types'
 
-export const getPartners = (ctx: KoaCTX) => {
+export const getPartners = async (ctx: KoaCTX) => {
   try {
-    const result = getPartnerDB()
-    ctx.body = Object.keys(result)
+    const result = await getPartnerDB('')
+    ctx.body = result
   } catch (error) {
     if (error instanceof Error) {
       ctx.status = 500
