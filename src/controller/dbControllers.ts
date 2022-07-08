@@ -1,13 +1,17 @@
-import { JsonDB } from 'node-json-db'
-import { Config } from 'node-json-db/dist/lib/JsonDBConfig'
+import {
+  checkPartnerDoesntExists,
+  checkPartnerExists,
+  deletePartnerDB,
+  getPartnerDB,
+  postPartnerDB,
+  putPartnerDB
+} from '../utils/jsonDB'
 import { postPartnerSchema, putPartnerSchema } from '../utils/schemas'
 import { KoaCTX, Partner } from '../utils/types'
 
-const db = new JsonDB(new Config('myDataBase', true, false, '/'))
-
 export const getPartners = (ctx: KoaCTX) => {
   try {
-    const result = db.getObject<Partner>(`/`)
+    const result = getPartnerDB()
     ctx.body = Object.keys(result)
   } catch (error) {
     if (error instanceof Error) {
@@ -20,9 +24,8 @@ export const getPartners = (ctx: KoaCTX) => {
 export const getPartner = (ctx: KoaCTX) => {
   try {
     const { name } = ctx.params
-    const partnerExists = db.exists(`/${name}`)
-    if (!partnerExists) throw new Error('Partner doesnt exist')
-    const result = db.getObject<Partner>(`/${name}`)
+    checkPartnerDoesntExists(name)
+    const result = getPartnerDB(name)
     ctx.body = result
   } catch (error) {
     if (error instanceof Error) {
@@ -38,12 +41,9 @@ export const postPartner = async (ctx: KoaCTX) => {
     await postPartnerSchema.validateAsync(body)
 
     const { name } = ctx.params
-    const partnerExists = db.exists(`/${name}`)
+    checkPartnerExists(name)
+    const result = postPartnerDB(name, body)
 
-    if (partnerExists) throw new Error('Partner already exists')
-
-    db.push(`/${name}`, body)
-    const result = db.getObject<Partner>(`/${name}`)
     ctx.body = result
   } catch (error) {
     if (error instanceof Error) {
@@ -58,12 +58,8 @@ export const putPartner = async (ctx: KoaCTX) => {
     const { name } = ctx.params
     const body = ctx.request.body as Partner
     await putPartnerSchema.validateAsync(body)
-
-    const partnerExists = db.exists(`/${name}`)
-    if (!partnerExists) throw new Error('Partner does not exist')
-
-    db.push(`/${name}`, body, false)
-    const result = db.getObject<Partner>(`/${name}`)
+    checkPartnerDoesntExists(name)
+    const result = putPartnerDB(name, body)
     ctx.body = result
   } catch (error) {
     if (error instanceof Error) {
@@ -76,10 +72,8 @@ export const putPartner = async (ctx: KoaCTX) => {
 export const deletePartner = async (ctx: KoaCTX) => {
   try {
     const { name } = ctx.params
-    const partnerExists = db.exists(`/${name}`)
-    if (!partnerExists) throw new Error('Partner does not exist')
-
-    db.delete(`/${name}`)
+    checkPartnerDoesntExists(name)
+    deletePartnerDB(name)
     ctx.body = `${name} - Deleted`
   } catch (error) {
     if (error instanceof Error) {
