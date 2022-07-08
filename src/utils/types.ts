@@ -1,5 +1,9 @@
-import { ParameterizedContext } from 'koa'
+import { ParameterizedContext, DefaultContext } from 'koa'
 import Router from 'koa-router'
+
+export interface CustomKoaAppContext {
+  profile: number
+}
 
 export interface Partner {
   template: string
@@ -8,7 +12,7 @@ export interface Partner {
 }
 
 export type KoaCTX = ParameterizedContext<
-  any,
-  Router.IRouterParamContext<any, {}>,
+  CustomKoaAppContext,
+  DefaultContext,
   any
 >

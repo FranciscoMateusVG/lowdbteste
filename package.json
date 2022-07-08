@@ -5,6 +5,8 @@
   "main": "index.js",
   "dependencies": {
     "@types/koa-bodyparser": "^4.3.7",
+    "bcrypt": "^5.0.1",
+    "joi": "^17.6.0",
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^11.0.1",
@@ -13,6 +15,7 @@
     "typescript": "^4.7.4"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/koa-router": "^7.4.4"
   },
   "scripts": {

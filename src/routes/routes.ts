@@ -1,21 +1,34 @@
 import Router from 'koa-router'
-import { JsonDB } from 'node-json-db'
-import { Config } from 'node-json-db/dist/lib/JsonDBConfig'
+import Koa from 'koa'
 import {
   getPartner,
   getPartners,
   postPartner,
   putPartner
 } from '../controller/dbControllers'
+import { KoaCTX } from '../utils/types'
 
 export const router = new Router()
 
-const db = new JsonDB(new Config('myDataBase', true, false, '/'))
+const onlyAdmin = async (ctx: KoaCTX, next: Koa.Next) => {
+  try {
+    if (ctx.profile === 0) {
+      await next()
+    } else {
+      throw new Error('Admins only')
+    }
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      ctx.status = 500
+      ctx.body = `Things exploded (${error.message})`
+    }
+  }
+}
 
-router.get('/partners', getPartners)
+router.get('/partners', onlyAdmin, getPartners)
 
 router.get('/partner/:name', getPartner)
 
-router.post('/partner/:name', postPartner)
+router.post('/partner/:name', onlyAdmin, postPartner)
 
-router.put('/partner/:name', putPartner)
+router.put('/partner/:name', onlyAdmin, putPartner)

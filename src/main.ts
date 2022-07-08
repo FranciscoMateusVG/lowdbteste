@@ -2,8 +2,9 @@ import Koa from 'koa'
 import bodyParser from 'koa-bodyparser'
 import { authentication } from './middleware/authentication'
 import { router } from './routes/routes'
+import { CustomKoaAppContext } from './utils/types'
 
-const app = new Koa()
+const app = new Koa<CustomKoaAppContext>()
 app.use(bodyParser())
 app.use(authentication)
 
