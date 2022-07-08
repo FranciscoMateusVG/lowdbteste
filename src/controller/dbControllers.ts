@@ -1,5 +1,6 @@
 import { JsonDB } from 'node-json-db'
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig'
+import { postPartnerSchema, putPartnerSchema } from '../utils/schemas'
 import { KoaCTX, Partner } from '../utils/types'
 
 const db = new JsonDB(new Config('myDataBase', true, false, '/'))
@@ -9,50 +10,65 @@ export const getPartners = (ctx: KoaCTX) => {
     const result = db.getObject<Partner>(`/`)
     ctx.body = Object.keys(result)
   } catch (error) {
-    ctx.status = 500
-    ctx.body = 'Partner already exists'
+    if (error instanceof Error) {
+      ctx.status = 500
+      ctx.body = `Things exploded (${error.message})`
+    }
   }
 }
 
 export const getPartner = (ctx: KoaCTX) => {
-  const { name } = ctx.params
-  const partnerExists = db.exists(`/${name}`)
   try {
+    const { name } = ctx.params
+    const partnerExists = db.exists(`/${name}`)
     if (!partnerExists) throw new Error('Partner doesnt exist')
     const result = db.getObject<Partner>(`/${name}`)
     ctx.body = result
   } catch (error) {
-    ctx.status = 500
-    ctx.body = 'Partner doesnt exist'
+    if (error instanceof Error) {
+      ctx.status = 500
+      ctx.body = `Things exploded (${error.message})`
+    }
   }
 }
 
-export const postPartner = (ctx: KoaCTX) => {
-  const body = ctx.request.body as Partner
-  const { name } = ctx.params
-  const partnerExists = db.exists(`/${name}`)
+export const postPartner = async (ctx: KoaCTX) => {
   try {
+    const body = ctx.request.body as Partner
+    await postPartnerSchema.validateAsync(body)
+
+    const { name } = ctx.params
+    const partnerExists = db.exists(`/${name}`)
+
     if (partnerExists) throw new Error('Partner already exists')
+
     db.push(`/${name}`, body)
     const result = db.getObject<Partner>(`/${name}`)
     ctx.body = result
   } catch (error) {
-    ctx.status = 500
-    ctx.body = 'Partner already exists'
+    if (error instanceof Error) {
+      ctx.status = 500
+      ctx.body = `Things exploded (${error.message})`
+    }
   }
 }
 
-export const putPartner = (ctx: KoaCTX) => {
-  const body = ctx.request.body as Partner
-  const { name } = ctx.params
-  const partnerExists = db.exists(`/${name}`)
+export const putPartner = async (ctx: KoaCTX) => {
   try {
-    if (!partnerExists) throw new Error('Partner doesnt exist')
+    const { name } = ctx.params
+    const body = ctx.request.body as Partner
+    await putPartnerSchema.validateAsync(body)
+
+    const partnerExists = db.exists(`/${name}`)
+    if (!partnerExists) throw new Error('Partner does not exist')
+
     db.push(`/${name}`, body, false)
     const result = db.getObject<Partner>(`/${name}`)
     ctx.body = result
   } catch (error) {
-    ctx.status = 500
-    ctx.body = 'Partner doesnt exists'
+    if (error instanceof Error) {
+      ctx.status = 500
+      ctx.body = `Things exploded (${error.message})`
+    }
   }
 }
